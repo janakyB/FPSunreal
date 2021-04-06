@@ -17,6 +17,8 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //////////////////////////////////////////////////////////////////////////
 // AFPSprojectCharacter
+ 
+
 
 AFPSprojectCharacter::AFPSprojectCharacter()
 {
@@ -86,11 +88,12 @@ AFPSprojectCharacter::AFPSprojectCharacter()
 	//bUsingMotionControllers = true;
 }
 
+
 void AFPSprojectCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-
+	CurrentLife = MaxLife;
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
@@ -121,6 +124,7 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSprojectCharacter::OnFire);
+	//PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFPSprojectCharacter::StopFire); 
 
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
@@ -138,10 +142,15 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAxis("TurnRate", this, &AFPSprojectCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AFPSprojectCharacter::LookUpAtRate);
+	
+
+
 }
 
 void AFPSprojectCharacter::OnFire()
 {
+	UE_LOG(LogTemp, Log, TEXT("Shoot"));
+
 	// try and fire a projectile
 	if (ProjectileClass != nullptr)
 	{
@@ -150,12 +159,13 @@ void AFPSprojectCharacter::OnFire()
 		FCollisionQueryParams Collide; 
 		FTransform StartTransform = FP_Gun->GetSocketTransform((FName("Muzzle")));
 		FVector StartLocation = FirstPersonCameraComponent->GetComponentLocation();
-		FVector EndLocation = StartLocation + FirstPersonCameraComponent->GetForwardVector() * 1000.f;
+		FVector EndLocation = StartLocation + FirstPersonCameraComponent->GetForwardVector() * 10000.f;
 		FColor color = FColor::Red; 
+		
 
 		float lifetime = 5.0f;
 
-		DrawDebugLine(World, StartLocation, EndLocation, color, true, lifetime);
+		//DrawDebugLine(World, StartLocation, EndLocation, color, true, lifetime);
 		if (World != nullptr)
 		{
 			if (bUsingMotionControllers)
@@ -178,9 +188,12 @@ void AFPSprojectCharacter::OnFire()
 				//World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 				UGameplayStatics::SpawnEmitterAtLocation(World, pParticle, FP_Gun->GetSocketTransform((FName("Muzzle"))));
 				World->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_Visibility);
+				FVector ImpulseDir = { Hit.ImpactPoint.X - StartLocation.X, Hit.ImpactPoint.Y - StartLocation.Y, Hit.ImpactPoint.Z - StartLocation.Z};
+				ImpulseDir.Normalize(); 
 				if (Hit.IsValidBlockingHit() == true) 
 				{
 					UGameplayStatics::SpawnEmitterAtLocation(World, mParticle, Hit.ImpactPoint);
+					Hit.GetComponent()->AddImpulseAtLocation(ImpulseDir * 100000, Hit.ImpactPoint); 
 				}
 				
 			}
@@ -233,6 +246,11 @@ void AFPSprojectCharacter::EndTouch(const ETouchIndex::Type FingerIndex, const F
 		return;
 	}
 	TouchItem.bIsPressed = false;
+}
+
+bool AFPSprojectCharacter::StopFire()
+{
+	return IsFire = false; 
 }
 
 //Commenting this section out to be consistent with FPS BP template.
@@ -317,3 +335,8 @@ bool AFPSprojectCharacter::EnableTouchscreenMovement(class UInputComponent* Play
 	
 	return false;
 }
+void AFPSprojectCharacter::GetDamage(double damage) 
+{
+	CurrentLife -= damage; 
+}
+

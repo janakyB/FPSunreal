@@ -58,6 +58,10 @@ class AFPSprojectCharacter : public ACharacter
 
 public:
 	AFPSprojectCharacter();
+	void OnTick(float deltatime); 
+	void GetDamage(double); 
+	int MaxLife = 10; 
+	int CurrentLife; 
 
 protected:
 	virtual void BeginPlay();
@@ -129,6 +133,8 @@ protected:
 	void EndTouch(const ETouchIndex::Type FingerIndex, const FVector Location);
 	void TouchUpdate(const ETouchIndex::Type FingerIndex, const FVector Location);
 	TouchData	TouchItem;
+	bool IsFire = false; 
+	bool StopFire(); 
 	
 protected:
 	// APawn interface
