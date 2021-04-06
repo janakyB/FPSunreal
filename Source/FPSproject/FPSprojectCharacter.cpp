@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
+#include "DrawDebugHelpers.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -25,6 +26,7 @@ AFPSprojectCharacter::AFPSprojectCharacter()
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
+	
 
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
@@ -143,7 +145,17 @@ void AFPSprojectCharacter::OnFire()
 	// try and fire a projectile
 	if (ProjectileClass != nullptr)
 	{
-		UWorld* const World = GetWorld();
+		UWorld* World = GetWorld();
+		FHitResult Hit; 
+		FCollisionQueryParams Collide; 
+		FTransform StartTransform = FP_Gun->GetSocketTransform((FName("Muzzle")));
+		FVector StartLocation = FirstPersonCameraComponent->GetComponentLocation();
+		FVector EndLocation = StartLocation + FirstPersonCameraComponent->GetForwardVector() * 1000.f;
+		FColor color = FColor::Red; 
+
+		float lifetime = 5.0f;
+
+		DrawDebugLine(World, StartLocation, EndLocation, color, true, lifetime);
 		if (World != nullptr)
 		{
 			if (bUsingMotionControllers)
@@ -153,17 +165,24 @@ void AFPSprojectCharacter::OnFire()
 				World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
 			}
 			else
-			{
+			{/*
 				const FRotator SpawnRotation = GetControlRotation();
 				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
 				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 
 				//Set Spawn Collision Handling Override
 				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;*/
 
 				// spawn the projectile at the muzzle
-				World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				//World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				UGameplayStatics::SpawnEmitterAtLocation(World, pParticle, FP_Gun->GetSocketTransform((FName("Muzzle"))));
+				World->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_Visibility);
+				if (Hit.IsValidBlockingHit() == true) 
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(World, mParticle, Hit.ImpactPoint);
+				}
+				
 			}
 		}
 	}

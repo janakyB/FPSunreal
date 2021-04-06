@@ -19,6 +19,11 @@ class AFPSprojectCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditDefaultsOnly, Category = Particule)
+	class UParticleSystem* pParticle;
+	UPROPERTY(EditDefaultsOnly, Category = Particule)
+	class UParticleSystem* mParticle; 
+
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
 	USkeletalMeshComponent* Mesh1P;
