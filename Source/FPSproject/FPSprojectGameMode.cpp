@@ -33,22 +33,18 @@ void AFPSprojectGameMode::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
 	CurrentDelay -= deltatime;
-	//UE_LOG(LogTemp, Log, TEXT("%f"), CurrentDelay); 
+	UE_LOG(LogTemp, Log, TEXT("%f"), CurrentDelay); 
 	
 	//GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition.Num)
 	if (CurrentDelay < 0 && CurrentWave <= NumberOfWaves) 
 	{
 		for (int i = 0; i < NumberEnemiesWave; i++)
 		{
-			//UE_LOG(LogTemp, Log, TEXT("Je suis un spawn"));
-			int pos = rand() % 4; 
-			//UE_LOG(LogTemp, Log, TEXT("%d"), pos);
-			
+			UE_LOG(LogTemp, Log, TEXT("Je suis un spawn"));
+			//int pos = rand() % 4; 
+			////UE_LOG(LogTemp, Log, TEXT("%d"), pos);
 			//UE_LOG(LogTemp, Log, TEXT("%d"), SpawnPosition[pos].GetLocation().X);
-			//GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition[pos])
-				//Set Spawn Collision Handling Override
-			//FActorSpawnParameters ActorSpawnParams;
-			//ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding; 
+			AEnemy* newEnemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition);  
 		}
 		CurrentDelay = DelayBetweenWaves;
 		NumberEnemiesWave *= 2; 

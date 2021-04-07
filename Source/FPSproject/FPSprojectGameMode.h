@@ -10,8 +10,8 @@ UCLASS(minimalapi)
 class AFPSprojectGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	UPROPERTY(EditAnyWhere, Category = Transform)
-	TArray< FTransform > SpawnPosition; 
+		UPROPERTY(EditAnyWhere, Category = Transform)
+		FTransform SpawnPosition; 
 
 	UPROPERTY(EditDefaultsOnly, Category = Enemy)
 	TSubclassOf<class AEnemy> EnemyClass;
