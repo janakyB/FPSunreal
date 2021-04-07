@@ -12,6 +12,7 @@
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 #include "DrawDebugHelpers.h"
+#include "Enemy.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -123,8 +124,8 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSprojectCharacter::OnFire);
-	//PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFPSprojectCharacter::StopFire); 
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSprojectCharacter::ActiveFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFPSprojectCharacter::StopFire); 
 
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
@@ -150,7 +151,7 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 void AFPSprojectCharacter::OnFire()
 {
 	UE_LOG(LogTemp, Log, TEXT("Shoot"));
-
+	LastTimeShoot = GetGameTimeSinceCreation(); 
 	// try and fire a projectile
 	if (ProjectileClass != nullptr)
 	{
@@ -161,8 +162,6 @@ void AFPSprojectCharacter::OnFire()
 		FVector StartLocation = FirstPersonCameraComponent->GetComponentLocation();
 		FVector EndLocation = StartLocation + FirstPersonCameraComponent->GetForwardVector() * 10000.f;
 		FColor color = FColor::Red; 
-		
-
 		float lifetime = 5.0f;
 
 		//DrawDebugLine(World, StartLocation, EndLocation, color, true, lifetime);
@@ -194,6 +193,11 @@ void AFPSprojectCharacter::OnFire()
 				{
 					UGameplayStatics::SpawnEmitterAtLocation(World, mParticle, Hit.ImpactPoint);
 					Hit.GetComponent()->AddImpulseAtLocation(ImpulseDir * 100000, Hit.ImpactPoint); 
+				}
+				if (Hit.GetActor()->GetName().Contains("BP_Enemy"))
+				{
+					AEnemy* enemy = (AEnemy*)Hit.GetActor();
+					enemy->GetDamage(Damage); 
 				}
 				
 			}
@@ -248,9 +252,13 @@ void AFPSprojectCharacter::EndTouch(const ETouchIndex::Type FingerIndex, const F
 	TouchItem.bIsPressed = false;
 }
 
-bool AFPSprojectCharacter::StopFire()
+void AFPSprojectCharacter::StopFire()
 {
-	return IsFire = false; 
+	 IsFire = false; 
+}
+void AFPSprojectCharacter::ActiveFire() 
+{
+	 IsFire = true; 
 }
 
 //Commenting this section out to be consistent with FPS BP template.
@@ -339,4 +347,15 @@ void AFPSprojectCharacter::GetDamage(double damage)
 {
 	CurrentLife -= damage; 
 }
-
+void AFPSprojectCharacter::Tick(float deltatime) 
+{
+	Super::Tick(deltatime); 
+	if (IsFire == true && CanShoot()) 
+	{
+		OnFire(); 
+	}
+}
+bool AFPSprojectCharacter::CanShoot() 
+{
+	return LastTimeShoot + fireRate < GetGameTimeSinceCreation(); 
+}

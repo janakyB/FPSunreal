@@ -134,7 +134,13 @@ protected:
 	void TouchUpdate(const ETouchIndex::Type FingerIndex, const FVector Location);
 	TouchData	TouchItem;
 	bool IsFire = false; 
-	bool StopFire(); 
+	void StopFire(); 
+	void ActiveFire(); 
+	float Damage = 5; 
+	float fireRate = 0.1;
+	float LastTimeShoot; 
+	void Tick(float deltatime) override; 
+	bool CanShoot(); 
 	
 protected:
 	// APawn interface

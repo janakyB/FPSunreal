@@ -17,7 +17,7 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-
+	CurrentLife = MaxLife; 
 
 }
 
@@ -59,5 +59,13 @@ void AEnemy::MoveToPLayer(float DeltaTime)
 bool AEnemy::CanHit()
 {
 	return LastTimeAttack + CoolDown < GetGameTimeSinceCreation();
+}
+void AEnemy::GetDamage(float dm) 
+{
+	CurrentLife -= dm; 
+	if (CurrentLife == 0) 
+	{
+		Destroy(); 
+	}
 }
 
