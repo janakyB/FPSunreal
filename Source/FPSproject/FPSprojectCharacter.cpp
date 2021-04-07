@@ -13,6 +13,7 @@
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
 #include "DrawDebugHelpers.h"
 #include "Enemy.h"
+#include "Engine/World.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -127,6 +128,7 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSprojectCharacter::ActiveFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFPSprojectCharacter::StopFire); 
 
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSprojectCharacter::Reload); 
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
 
@@ -150,11 +152,11 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 void AFPSprojectCharacter::OnFire()
 {
+	ammo--; 
 	UE_LOG(LogTemp, Log, TEXT("Shoot"));
+	UE_LOG(LogTemp, Log, TEXT("%d"), ammo);
 	LastTimeShoot = GetGameTimeSinceCreation(); 
 	// try and fire a projectile
-	if (ProjectileClass != nullptr)
-	{
 		UWorld* World = GetWorld();
 		FHitResult Hit; 
 		FCollisionQueryParams Collide; 
@@ -169,9 +171,9 @@ void AFPSprojectCharacter::OnFire()
 		{
 			if (bUsingMotionControllers)
 			{
-				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
+				/*const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
 				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+				World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);*/
 			}
 			else
 			{/*
@@ -189,20 +191,19 @@ void AFPSprojectCharacter::OnFire()
 				World->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_Visibility);
 				FVector ImpulseDir = { Hit.ImpactPoint.X - StartLocation.X, Hit.ImpactPoint.Y - StartLocation.Y, Hit.ImpactPoint.Z - StartLocation.Z};
 				ImpulseDir.Normalize(); 
-				if (Hit.IsValidBlockingHit() == true) 
+				if (Hit.IsValidBlockingHit() == true ) 
 				{
 					UGameplayStatics::SpawnEmitterAtLocation(World, mParticle, Hit.ImpactPoint);
 					Hit.GetComponent()->AddImpulseAtLocation(ImpulseDir * 100000, Hit.ImpactPoint); 
+					if (Hit.GetActor()->GetName().Contains("BP_Enemy"))
+					{
+						AEnemy* enemy = (AEnemy*)Hit.GetActor();
+						enemy->GetDamage(Damage);
+					}	
 				}
-				if (Hit.GetActor()->GetName().Contains("BP_Enemy"))
-				{
-					AEnemy* enemy = (AEnemy*)Hit.GetActor();
-					enemy->GetDamage(Damage); 
-				}
-				
 			}
 		}
-	}
+
 
 	// try and play the sound if specified
 	if (FireSound != nullptr)
@@ -350,12 +351,28 @@ void AFPSprojectCharacter::GetDamage(double damage)
 void AFPSprojectCharacter::Tick(float deltatime) 
 {
 	Super::Tick(deltatime); 
-	if (IsFire == true && CanShoot()) 
+	if (IsFire == true && CanShoot() && ammo > 0) 
 	{
 		OnFire(); 
+	}
+	else if (ammo <= 0) {
+		Reload(); 
 	}
 }
 bool AFPSprojectCharacter::CanShoot() 
 {
 	return LastTimeShoot + fireRate < GetGameTimeSinceCreation(); 
+}
+bool AFPSprojectCharacter::CanReload() 
+{
+		return LastTimeShoot + reload < GetGameTimeSinceCreation(); 
+}
+void AFPSprojectCharacter::Reload() 
+{
+	IsFire = false;
+	ammo = 0; 
+	if (CanReload()) 
+	{
+		ammo = 54; 
+	 }
 }

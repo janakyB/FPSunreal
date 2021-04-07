@@ -21,9 +21,9 @@ public:
 	void SpawnEnemy(FTransform); 
 	int NumberOfWaves = 5; 
 	int NumberEnemiesWave = 5; 
-	float DelayBetweenWaves = 20.0f; 
+	float DelayBetweenWaves = 5.0f; 
 	float CurrentDelay; 
-	float CurrentEnemy; 
+	int CurrentWave; 
 	float DelayBetweenEnemies = 3.0f; 
 protected: 
 	virtual void BeginPlay() override; 

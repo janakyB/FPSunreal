@@ -139,8 +139,12 @@ protected:
 	float Damage = 5; 
 	float fireRate = 0.1;
 	float LastTimeShoot; 
+	int ammo = 54; 
+	float reload = 3.0f; 
 	void Tick(float deltatime) override; 
-	bool CanShoot(); 
+	bool CanShoot();
+	bool CanReload(); 
+	void Reload(); 
 	
 protected:
 	// APawn interface
