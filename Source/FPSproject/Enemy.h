@@ -11,27 +11,27 @@ class FPSPROJECT_API AEnemy : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* Mesh1E;
-	
-public:	
+		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		USkeletalMeshComponent* Mesh1E;
+
+public:
 	// Sets default values for this actor's properties
 	AEnemy();
-	void MoveToPLayer(float Deltatime); 
-	bool CanHit(); 
-	float MoveSpeed = 200.0f; 
-	bool IsAttacking = false; 
-	float AttackDistance = 300.f; 
-	float LastTimeAttack = 0.0f; 
-	float CoolDown = 5.0f; 
-	float Damage = 1.0f; 
+	void MoveToPLayer(float Deltatime);
+	bool CanHit();
+	float MoveSpeed = 200.0f;
+	bool IsAttacking = false;
+	float AttackDistance = 300.f;
+	float LastTimeAttack = 0.0f;
+	float CoolDown = 5.0f;
+	float Damage = 1.0f;
 	FHitResult hit;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
