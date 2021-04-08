@@ -18,7 +18,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentLife = MaxLife; 
-
+	//Mesh1E->PlayAnimation(animIdle, true); 
+	Mesh1E->PlayAnimation(animWalk, true);
 }
 
 // Called every frame
@@ -27,6 +28,11 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	MoveToPLayer(DeltaTime);
 	CanHit();
+	Dead(); 
+	if (Death == true) 
+	{
+		DelayDeath -= DeltaTime;
+	}
 
 }
 
@@ -40,19 +46,22 @@ void AEnemy::MoveToPLayer(float DeltaTime)
 	FRotator Rotation = { GetActorRotation().Vector().X, Angle, GetActorRotation().Vector().Z };
 	SetActorRotation(Rotation);
 	float Norme = Direction.Size();
-	if (Norme > AttackDistance)
+	if (Norme > AttackDistance && Death == false)
 	{
 		IsAttacking = false;
 		Direction.Normalize();
-		SetActorLocation(EnemyPosition + Direction * DeltaTime * MoveSpeed);
+		FVector Movement = { EnemyPosition.X + Direction.X * DeltaTime * MoveSpeed, EnemyPosition.Y + Direction.Y * DeltaTime * MoveSpeed, EnemyPosition.Z }; 
+		SetActorLocation(Movement);
+		
 	}
-	else if (Norme <= AttackDistance && CanHit())
+	else if (Norme <= AttackDistance && CanHit() && Death == false)
 	{
 		IsAttacking = true;
 		LastTimeAttack = GetGameTimeSinceCreation();
 		SetActorLocation(EnemyPosition);
 		AFPSprojectCharacter* player = (AFPSprojectCharacter*)GetWorld()->GetFirstPlayerController()->GetPawn();
 		player->GetDamage(Damage);
+		Mesh1E->PlayAnimation(animAttack, true);
 		UE_LOG(LogTemp, Log, TEXT("%d"), player->CurrentLife);
 	}
 }
@@ -63,9 +72,18 @@ bool AEnemy::CanHit()
 void AEnemy::GetDamage(float dm) 
 {
 	CurrentLife -= dm; 
-	if (CurrentLife == 0) 
+}
+void AEnemy::Dead() 
+{
+	if (CurrentLife <= 0 && Death == false) 
 	{
-		Destroy(); 
+		Death = true; 
+		Mesh1E->PlayAnimation(animDeath, false);
+		
+	}
+	if (DelayDeath < 0)
+	{
+		Destroy();
 	}
 }
 

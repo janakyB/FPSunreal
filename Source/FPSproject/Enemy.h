@@ -13,15 +13,24 @@ class FPSPROJECT_API AEnemy : public AActor
 
 		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		USkeletalMeshComponent* Mesh1E;
-
+	UPROPERTY(EditDefaultsOnly, Category = animation)
+		UAnimSequence* animIdle;
+	UPROPERTY(EditDefaultsOnly, Category = animation)
+		UAnimSequence* animWalk;
+	UPROPERTY(EditDefaultsOnly, Category = animation)
+		UAnimSequence* animAttack;
+	UPROPERTY(EditDefaultsOnly, Category = animation)
+		UAnimSequence* animDeath;
 public:
 	// Sets default values for this actor's properties
 	AEnemy();
 	void MoveToPLayer(float Deltatime);
 	bool CanHit();
 	void GetDamage(float); 
-	float MoveSpeed = 200.0f;
+	void Dead(); 
+	float MoveSpeed = 150.0f;
 	bool IsAttacking = false;
+	bool Death = false; 
 	float AttackDistance = 300.f;
 	float LastTimeAttack = 0.0f;
 	float CoolDown = 5.0f;
@@ -29,6 +38,7 @@ public:
 	FHitResult hit;
 	float MaxLife = 5; 
 	float CurrentLife; 
+	float DelayDeath = 3.0f; 
 
 protected:
 	// Called when the game starts or when spawned

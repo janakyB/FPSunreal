@@ -34,7 +34,7 @@ void AFPSprojectGameMode::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
 	CurrentDelay -= deltatime;
-
+	
 	
 	//GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition.Num)
 	if (CurrentDelay < 0 && CurrentWave <= NumberOfWaves) 
