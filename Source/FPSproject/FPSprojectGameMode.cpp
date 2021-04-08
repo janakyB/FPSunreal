@@ -24,7 +24,8 @@ AFPSprojectGameMode::AFPSprojectGameMode()
 void AFPSprojectGameMode::BeginPlay() 
 {
 	Super::BeginPlay(); 
-	CurrentDelay = DelayBetweenWaves; 
+	CurrentDelay = DelayBetweenWaves;
+	CurrentDelayEnnemies = DelayBetweenEnemies; 
 	CurrentWave = 0;
 	srand(time(NULL)); 
 	
@@ -33,25 +34,30 @@ void AFPSprojectGameMode::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
 	CurrentDelay -= deltatime;
-	UE_LOG(LogTemp, Log, TEXT("%f"), CurrentDelay); 
+
 	
 	//GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition.Num)
 	if (CurrentDelay < 0 && CurrentWave <= NumberOfWaves) 
 	{
-		for (int i = 0; i < NumberEnemiesWave; i++)
+		Spawn = true; 
+		CurrentDelayEnnemies -= deltatime; 
+		if (CurrentDelayEnnemies < 0 && Count <= NumberEnemiesWave && Spawn == true) 
 		{
-			UE_LOG(LogTemp, Log, TEXT("Je suis un spawn"));
-			int pos = rand() % 4; 
-			////UE_LOG(LogTemp, Log, TEXT("%d"), pos);
-			//UE_LOG(LogTemp, Log, TEXT("%d"), SpawnPosition[pos].GetLocation().X);
+			
+			int pos = rand() % 4;
 			AEnemy* newEnemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition[pos]);
+			Count++;
+			CurrentDelayEnnemies = DelayBetweenEnemies; 
 		}
-		CurrentDelay = DelayBetweenWaves;
-		NumberEnemiesWave *= 2; 
-		CurrentWave += 1; 
-
-		
+		else if (Count > NumberEnemiesWave)
+		{
+			Count = 0; 
+			Spawn = false; 
+			CurrentDelay = DelayBetweenWaves; 
+			NumberEnemiesWave *= 2; 
+			CurrentWave++; 
+		}
 	}
-
 }
+
 

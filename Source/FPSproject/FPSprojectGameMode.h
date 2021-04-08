@@ -18,13 +18,16 @@ class AFPSprojectGameMode : public AGameModeBase
 public:
 	AFPSprojectGameMode();
 	void WaveManager();
-	void SpawnEnemy(FTransform); 
+	bool DelaySpawnEnemy(); 
 	int NumberOfWaves = 5; 
 	int NumberEnemiesWave = 5; 
 	float DelayBetweenWaves = 5.0f; 
 	float CurrentDelay; 
 	int CurrentWave; 
-	float DelayBetweenEnemies = 3.0f; 
+	float DelayBetweenEnemies = 1.0f;
+	float CurrentDelayEnnemies; 
+	float Count = 0; 
+	bool Spawn; 
 protected: 
 	virtual void BeginPlay() override; 
 public : 
