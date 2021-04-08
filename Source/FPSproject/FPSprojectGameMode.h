@@ -11,7 +11,7 @@ class AFPSprojectGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 		UPROPERTY(EditAnyWhere, Category = Transform)
-		FTransform SpawnPosition; 
+		TArray < FTransform > SpawnPosition; 
 
 	UPROPERTY(EditDefaultsOnly, Category = Enemy)
 	TSubclassOf<class AEnemy> EnemyClass;

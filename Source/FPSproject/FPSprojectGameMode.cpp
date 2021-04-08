@@ -41,10 +41,10 @@ void AFPSprojectGameMode::Tick(float deltatime)
 		for (int i = 0; i < NumberEnemiesWave; i++)
 		{
 			UE_LOG(LogTemp, Log, TEXT("Je suis un spawn"));
-			//int pos = rand() % 4; 
+			int pos = rand() % 4; 
 			////UE_LOG(LogTemp, Log, TEXT("%d"), pos);
 			//UE_LOG(LogTemp, Log, TEXT("%d"), SpawnPosition[pos].GetLocation().X);
-			AEnemy* newEnemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition);  
+			AEnemy* newEnemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition[pos]);
 		}
 		CurrentDelay = DelayBetweenWaves;
 		NumberEnemiesWave *= 2; 
