@@ -14,6 +14,7 @@
 #include "DrawDebugHelpers.h"
 #include "Enemy.h"
 #include "Engine/World.h"
+#include "Gun.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
@@ -97,7 +98,7 @@ void AFPSprojectCharacter::BeginPlay()
 	Super::BeginPlay();
 	CurrentLife = MaxLife;
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-	FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	//FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
 	// Show or hide the two versions of the gun based on whether or not we're using motion controllers.
 	if (bUsingMotionControllers)
@@ -110,6 +111,24 @@ void AFPSprojectCharacter::BeginPlay()
 		VR_Gun->SetHiddenInGame(true, true);
 		Mesh1P->SetHiddenInGame(false, true);
 	}
+	for (int i = 0; i < WeaponArray.Num(); i++)
+	{
+		AGun* tempgun = GetWorld()->SpawnActor<AGun>( WeaponArray[ i ] );
+		GunList.Add(tempgun); 
+	}
+	for (size_t i = 0; i < GunList.Num(); i++)
+	{
+		GunList[i]->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+		if (i == 0) 
+		{
+			GunList[i]->GetGun()->SetHiddenInGame(true); 
+		}
+		else 
+		{
+			GunList[i]->GetGun()->SetHiddenInGame(false);
+		}
+	}
+	
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -127,6 +146,19 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSprojectCharacter::ActiveFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFPSprojectCharacter::StopFire); 
+
+	//Change Weapon
+	//PlayerInputComponent->BindAction("AssaultRifle", IE_Pressed, this, &AFPSprojectCharacter::ChangeWeapon, 0); 
+	//PlayerInputComponent->BindAction("ShotGun", IE_Pressed, this, &AFPSprojectCharacter::ChangeWeapon);
+	DECLARE_DELEGATE_OneParam(FCustomInputDelegate, const int);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("AssaultRiffle", IE_Pressed, this, &AFPSprojectCharacter::ChangeWeapon, 0);
+	DECLARE_DELEGATE_OneParam(FCustomInputDelegate, const int);
+	PlayerInputComponent->BindAction<FCustomInputDelegate>("ShotGun", IE_Pressed, this, &AFPSprojectCharacter::ChangeWeapon, 1);
+
+
+	//PlayerInputComponent->BindAction("AssaultRiffle", IE_Pressed, this, &AFPSprojectCharacter::ChangeWeapon,0);
+
+	//PlayerInputComponent->BindAction("AssaultRifle", IE_Pressed, this, &AFPSprojectCharacter::ChangeWeapon);
 
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSprojectCharacter::Reload); 
 	// Enable touchscreen input
@@ -375,4 +407,21 @@ void AFPSprojectCharacter::Reload()
 	{
 		ammo = 54; 
 	 }
+}
+void AFPSprojectCharacter::ChangeWeapon(int index)
+{
+	
+	UE_LOG(LogTemp, Log, TEXT("Je suis un chat")); 
+	IndexGunList = index; 
+	for (int  i = 0; i < GunList.Num(); i++)
+	{
+		if (GunList[i] == GunList[IndexGunList]) 
+		{
+			GunList[i]->GetGun()->SetHiddenInGame(false);
+		}
+		else 
+		{
+			GunList[i]->GetGun()->SetHiddenInGame(true);
+		}
+	}
 }

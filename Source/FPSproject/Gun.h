@@ -30,7 +30,7 @@ class FPSPROJECT_API AGun : public AActor
 public:	
 	// Sets default values for this actor's properties 
 	AGun();
- 
+	USkeletalMeshComponent* GetGun(); 
 
 protected:
 	// Called when the game starts or when spawned

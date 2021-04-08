@@ -32,8 +32,8 @@ class AFPSprojectCharacter : public ACharacter
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* FP_Gun;
 	
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	TArray < UBlueprint* > WeaponArray; 
+	UPROPERTY(EditDefaultsOnly, Category = Mesh)
+	TArray < TSubclassOf<class AGun> > WeaponArray; 
 
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
@@ -63,8 +63,11 @@ public:
 	AFPSprojectCharacter();
 	void OnTick(float deltatime); 
 	void GetDamage(double); 
+	void ChangeWeapon(int); 
 	int MaxLife = 100; 
 	int CurrentLife; 
+	int IndexGunList; 
+	TArray < AGun* > GunList;
 
 protected:
 	virtual void BeginPlay();

@@ -24,4 +24,8 @@ void AGun::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+USkeletalMeshComponent* AGun::GetGun() 
+{
+	return FP_Gun; 
+}
 
