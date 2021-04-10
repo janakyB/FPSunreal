@@ -11,27 +11,28 @@ class AFPSprojectGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 		UPROPERTY(EditAnyWhere, Category = Transform)
-		TArray < FTransform > SpawnPosition; 
+		TArray < FTransform > SpawnPosition;
 
 	UPROPERTY(EditDefaultsOnly, Category = Enemy)
-	TSubclassOf<class AEnemy> EnemyClass;
+		TSubclassOf<class AEnemy> EnemyClass;
 public:
 	AFPSprojectGameMode();
 	void WaveManager();
-	bool DelaySpawnEnemy(); 
-	int NumberOfWaves = 5; 
-	int NumberEnemiesWave = 5; 
-	float DelayBetweenWaves = 20.0f; 
-	float CurrentDelay; 
-	int CurrentWave; 
+	bool DelaySpawnEnemy();
+	void DeathAndRespawn();
+	int NumberOfWaves = 5;
+	int NumberEnemiesWave = 5;
+	float DelayBetweenWaves = 20.0f;
+	float CurrentDelay;
+	int CurrentWave;
 	float DelayBetweenEnemies = 1.0f;
-	float CurrentDelayEnnemies; 
-	float Count = 0; 
-	bool Spawn; 
-protected: 
-	virtual void BeginPlay() override; 
-public : 
-	virtual void Tick(float deltatime) override; 
+	float CurrentDelayEnnemies;
+	float Count = 0;
+	bool Spawn;
+protected:
+	virtual void BeginPlay() override;
+public:
+	virtual void Tick(float deltatime) override;
 };
 
 

@@ -17,7 +17,7 @@ AEnemy::AEnemy()
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
-	CurrentLife = MaxLife; 
+	CurrentLife = MaxLife;
 	//Mesh1E->PlayAnimation(animIdle, true); 
 	Mesh1E->PlayAnimation(animWalk, true);
 }
@@ -28,8 +28,8 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	MoveToPLayer(DeltaTime);
 	CanHit();
-	Dead(); 
-	if (Death == true) 
+	Dead();
+	if (Death == true)
 	{
 		DelayDeath -= DeltaTime;
 	}
@@ -50,9 +50,9 @@ void AEnemy::MoveToPLayer(float DeltaTime)
 	{
 		IsAttacking = false;
 		Direction.Normalize();
-		FVector Movement = { EnemyPosition.X + Direction.X * DeltaTime * MoveSpeed, EnemyPosition.Y + Direction.Y * DeltaTime * MoveSpeed, EnemyPosition.Z }; 
+		FVector Movement = { EnemyPosition.X + Direction.X * DeltaTime * MoveSpeed, EnemyPosition.Y + Direction.Y * DeltaTime * MoveSpeed, EnemyPosition.Z };
 		SetActorLocation(Movement);
-		
+
 	}
 	else if (Norme <= AttackDistance && CanHit() && Death == false)
 	{
@@ -69,17 +69,17 @@ bool AEnemy::CanHit()
 {
 	return LastTimeAttack + CoolDown < GetGameTimeSinceCreation();
 }
-void AEnemy::GetDamage(float dm) 
+void AEnemy::GetDamage(float dm)
 {
-	CurrentLife -= dm; 
+	CurrentLife -= dm;
 }
-void AEnemy::Dead() 
+void AEnemy::Dead()
 {
-	if (CurrentLife <= 0 && Death == false) 
+	if (CurrentLife <= 0 && Death == false)
 	{
-		Death = true; 
+		Death = true;
 		Mesh1E->PlayAnimation(animDeath, false);
-		
+
 	}
 	if (DelayDeath < 0)
 	{

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "FPSprojectCharacter.h"
+
 #include "Gun.generated.h"
 
 UCLASS()
@@ -11,32 +13,45 @@ class FPSPROJECT_API AGun : public AActor
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* FP_Gun;
+		UPROPERTY(EditDefaultsOnly, Category = Mesh)
+		USkeletalMeshComponent* FP_Gun;
 
 	UPROPERTY(EditAnyWhere, Category = stats)
-	float MaxAmmo;
+		float MaxAmmo;
 
 	UPROPERTY(EditAnyWhere, Category = stats)
-	float Damage;
+		float Damage;
 
 	UPROPERTY(EditAnyWhere, Category = stats)
-	float Reload;
+		float Reload;
 
 	UPROPERTY(EditAnyWhere, Category = stats)
-	float FireRate;
+		float FireRate;
 
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties 
 	AGun();
-	USkeletalMeshComponent* GetGun(); 
+	USkeletalMeshComponent* GetGun();
+	float GetAmmo();
+	float GetDamage();
+	float GetReloadTime();
+	float GetFireRate();
+	float LastTimeShoot;
+	float CurrentAmmo;
+	void SetAmmo();
+
+	bool CanShoot();
+	bool CanReload();
+	void Reloading();
+	void DecreaseAmmo();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

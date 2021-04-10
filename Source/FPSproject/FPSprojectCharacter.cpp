@@ -20,7 +20,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 //////////////////////////////////////////////////////////////////////////
 // AFPSprojectCharacter
- 
+
 
 
 AFPSprojectCharacter::AFPSprojectCharacter()
@@ -31,7 +31,7 @@ AFPSprojectCharacter::AFPSprojectCharacter()
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
-	
+
 
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
@@ -111,24 +111,27 @@ void AFPSprojectCharacter::BeginPlay()
 		VR_Gun->SetHiddenInGame(true, true);
 		Mesh1P->SetHiddenInGame(false, true);
 	}
+
+
+
 	for (int i = 0; i < WeaponArray.Num(); i++)
 	{
-		AGun* tempgun = GetWorld()->SpawnActor<AGun>( WeaponArray[ i ] );
-		GunList.Add(tempgun); 
+		AGun* tempgun = GetWorld()->SpawnActor<AGun>(WeaponArray[i]);
+		GunList.Add(tempgun);
 	}
 	for (size_t i = 0; i < GunList.Num(); i++)
 	{
 		GunList[i]->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-		if (i == 0) 
-		{
-			GunList[i]->GetGun()->SetHiddenInGame(true); 
-		}
-		else 
+		if (i == 0)
 		{
 			GunList[i]->GetGun()->SetHiddenInGame(false);
 		}
+		else
+		{
+			GunList[i]->GetGun()->SetHiddenInGame(true);
+		}
 	}
-	
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -145,7 +148,7 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSprojectCharacter::ActiveFire);
-	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFPSprojectCharacter::StopFire); 
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AFPSprojectCharacter::StopFire);
 
 	//Change Weapon
 	//PlayerInputComponent->BindAction("AssaultRifle", IE_Pressed, this, &AFPSprojectCharacter::ChangeWeapon, 0); 
@@ -159,8 +162,7 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	//PlayerInputComponent->BindAction("AssaultRiffle", IE_Pressed, this, &AFPSprojectCharacter::ChangeWeapon,0);
 
 	//PlayerInputComponent->BindAction("AssaultRifle", IE_Pressed, this, &AFPSprojectCharacter::ChangeWeapon);
-
-	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSprojectCharacter::Reload); 
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFPSprojectCharacter::Reload);
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
 
@@ -177,64 +179,61 @@ void AFPSprojectCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAxis("TurnRate", this, &AFPSprojectCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AFPSprojectCharacter::LookUpAtRate);
-	
+
 
 
 }
 
 void AFPSprojectCharacter::OnFire()
 {
-	ammo--; 
-	UE_LOG(LogTemp, Log, TEXT("Shoot"));
-	UE_LOG(LogTemp, Log, TEXT("%d"), ammo);
-	LastTimeShoot = GetGameTimeSinceCreation(); 
+	GunList[IndexGunList]->DecreaseAmmo();
 	// try and fire a projectile
-		UWorld* World = GetWorld();
-		FHitResult Hit; 
-		FCollisionQueryParams Collide; 
-		FTransform StartTransform = FP_Gun->GetSocketTransform((FName("Muzzle")));
-		FVector StartLocation = FirstPersonCameraComponent->GetComponentLocation();
-		FVector EndLocation = StartLocation + FirstPersonCameraComponent->GetForwardVector() * 10000.f;
-		FColor color = FColor::Red; 
-		float lifetime = 5.0f;
+	UWorld* World = GetWorld();
+	FHitResult Hit;
+	FCollisionQueryParams Collide;
+	FTransform StartTransform = FP_Gun->GetSocketTransform((FName("Muzzle")));
+	FVector StartLocation = FirstPersonCameraComponent->GetComponentLocation();
+	FVector EndLocation = StartLocation + FirstPersonCameraComponent->GetForwardVector() * 10000.f;
+	FColor color = FColor::Red;
+	float lifetime = 5.0f;
 
-		//DrawDebugLine(World, StartLocation, EndLocation, color, true, lifetime);
-		if (World != nullptr)
+	//DrawDebugLine(World, StartLocation, EndLocation, color, true, lifetime);
+	if (World != nullptr)
+	{
+		if (bUsingMotionControllers)
 		{
-			if (bUsingMotionControllers)
+			/*const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
+			const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
+			World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);*/
+		}
+		else
+		{/*
+			const FRotator SpawnRotation = GetControlRotation();
+			// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+			const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+
+			//Set Spawn Collision Handling Override
+			FActorSpawnParameters ActorSpawnParams;
+			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;*/
+
+			// spawn the projectile at the muzzle
+			//World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			UGameplayStatics::SpawnEmitterAtLocation(World, pParticle, GunList[IndexGunList]->GetGun()->GetSocketTransform((FName("Muzzle"))));
+			World->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_Visibility);
+			FVector ImpulseDir = { Hit.ImpactPoint.X - StartLocation.X, Hit.ImpactPoint.Y - StartLocation.Y, Hit.ImpactPoint.Z - StartLocation.Z };
+			ImpulseDir.Normalize();
+			if (Hit.IsValidBlockingHit() == true)
 			{
-				/*const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
-				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);*/
-			}
-			else
-			{/*
-				const FRotator SpawnRotation = GetControlRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
-
-				//Set Spawn Collision Handling Override
-				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;*/
-
-				// spawn the projectile at the muzzle
-				//World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-				UGameplayStatics::SpawnEmitterAtLocation(World, pParticle, FP_Gun->GetSocketTransform((FName("Muzzle"))));
-				World->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_Visibility);
-				FVector ImpulseDir = { Hit.ImpactPoint.X - StartLocation.X, Hit.ImpactPoint.Y - StartLocation.Y, Hit.ImpactPoint.Z - StartLocation.Z};
-				ImpulseDir.Normalize(); 
-				if (Hit.IsValidBlockingHit() == true ) 
+				UGameplayStatics::SpawnEmitterAtLocation(World, mParticle, Hit.ImpactPoint);
+				Hit.GetComponent()->AddImpulseAtLocation(ImpulseDir * 100000, Hit.ImpactPoint);
+				if (Hit.GetActor()->GetName().Contains("BP_Enemy"))
 				{
-					UGameplayStatics::SpawnEmitterAtLocation(World, mParticle, Hit.ImpactPoint);
-					Hit.GetComponent()->AddImpulseAtLocation(ImpulseDir * 100000, Hit.ImpactPoint); 
-					if (Hit.GetActor()->GetName().Contains("BP_Enemy"))
-					{
-						AEnemy* enemy = (AEnemy*)Hit.GetActor();
-						enemy->GetDamage(Damage);
-					}	
+					AEnemy* enemy = (AEnemy*)Hit.GetActor();
+					enemy->GetDamage(GunList[IndexGunList]->GetDamage());
 				}
 			}
 		}
+	}
 
 
 	// try and play the sound if specified
@@ -287,11 +286,11 @@ void AFPSprojectCharacter::EndTouch(const ETouchIndex::Type FingerIndex, const F
 
 void AFPSprojectCharacter::StopFire()
 {
-	 IsFire = false; 
+	IsFire = false;
 }
-void AFPSprojectCharacter::ActiveFire() 
+void AFPSprojectCharacter::ActiveFire()
 {
-	 IsFire = true; 
+	IsFire = true;
 }
 
 //Commenting this section out to be consistent with FPS BP template.
@@ -373,55 +372,49 @@ bool AFPSprojectCharacter::EnableTouchscreenMovement(class UInputComponent* Play
 		//PlayerInputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AFPSprojectCharacter::TouchUpdate);
 		return true;
 	}
-	
+
 	return false;
 }
-void AFPSprojectCharacter::GetDamage(double damage) 
+void AFPSprojectCharacter::GetDamage(double damage)
 {
-	CurrentLife -= damage; 
-}
-void AFPSprojectCharacter::Tick(float deltatime) 
-{
-	Super::Tick(deltatime); 
-	if (IsFire == true && CanShoot() && ammo > 0) 
+	CurrentLife -= damage;
+	if (CurrentLife <= 0)
 	{
-		OnFire(); 
-	}
-	else if (ammo <= 0) {
-		Reload(); 
+		//UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 	}
 }
-bool AFPSprojectCharacter::CanShoot() 
+void AFPSprojectCharacter::Tick(float deltatime)
 {
-	return LastTimeShoot + fireRate < GetGameTimeSinceCreation(); 
-}
-bool AFPSprojectCharacter::CanReload() 
-{
-		return LastTimeShoot + reload < GetGameTimeSinceCreation(); 
-}
-void AFPSprojectCharacter::Reload() 
-{
-	IsFire = false;
-	ammo = 0; 
-	if (CanReload()) 
+	Super::Tick(deltatime);
+	if (IsFire == true && GunList[IndexGunList]->CanShoot() && GunList[IndexGunList]->GetAmmo() > 0)
 	{
-		ammo = 54; 
-	 }
+		OnFire();
+	}
+	else if (GunList[IndexGunList]->GetAmmo() <= 0) {
+		Reload();
+	}
+}
+void AFPSprojectCharacter::Reload()
+{
+	//IsFire = false;
+	GunList[IndexGunList]->Reloading();
 }
 void AFPSprojectCharacter::ChangeWeapon(int index)
 {
-	
-	UE_LOG(LogTemp, Log, TEXT("Je suis un chat")); 
-	IndexGunList = index; 
-	for (int  i = 0; i < GunList.Num(); i++)
+	IndexGunList = index;
+	for (int i = 0; i < GunList.Num(); i++)
 	{
-		if (GunList[i] == GunList[IndexGunList]) 
+		if (GunList[i] == GunList[IndexGunList])
 		{
 			GunList[i]->GetGun()->SetHiddenInGame(false);
 		}
-		else 
+		else
 		{
 			GunList[i]->GetGun()->SetHiddenInGame(true);
 		}
 	}
+}
+void AFPSprojectCharacter::DeathAndRespawn()
+{
+
 }

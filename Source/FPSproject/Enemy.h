@@ -26,19 +26,19 @@ public:
 	AEnemy();
 	void MoveToPLayer(float Deltatime);
 	bool CanHit();
-	void GetDamage(float); 
-	void Dead(); 
+	void GetDamage(float);
+	void Dead();
 	float MoveSpeed = 150.0f;
 	bool IsAttacking = false;
-	bool Death = false; 
+	bool Death = false;
 	float AttackDistance = 300.f;
 	float LastTimeAttack = 0.0f;
 	float CoolDown = 5.0f;
 	float Damage = 1.0f;
 	FHitResult hit;
-	float MaxLife = 5; 
-	float CurrentLife; 
-	float DelayDeath = 3.0f; 
+	float MaxLife = 5;
+	float CurrentLife;
+	float DelayDeath = 3.0f;
 
 protected:
 	// Called when the game starts or when spawned
