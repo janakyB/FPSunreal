@@ -2,6 +2,8 @@
 
 
 #include "Gun.h"
+#include "Kismet/GameplayStatics.h"
+#include "Enemy.h"
 
 // Sets default values
 AGun::AGun()
@@ -67,4 +69,37 @@ void AGun::DecreaseAmmo()
 	CurrentAmmo--;
 	LastTimeShoot = GetGameTimeSinceCreation();
 }
+void AGun::Shoot(FVector StartLocation, FVector EndLocation, UParticleSystem* FireParticule, UParticleSystem* OutParticle)
+{
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), FireParticule, GetGun()->GetSocketTransform((FName("Muzzle"))));
+	for (int i = 0; i < NumberShoot; i++)
+	{
+		float Y = RandShoot(-precision, precision);
+		float Z = RandShoot(-precision, precision);
+		FVector RandomVector = { EndLocation.X, EndLocation.Y + Y, EndLocation.Z + Z };
+		GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, RandomVector, ECC_Visibility);
+		FVector ImpulseDir = { Hit.ImpactPoint.X - StartLocation.X, Hit.ImpactPoint.Y - StartLocation.Y, Hit.ImpactPoint.Z - StartLocation.Z };
+		ImpulseDir.Normalize();
+		ImpulseDir *= ImpulseForce;
+		if (Hit.IsValidBlockingHit() == true)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OutParticle, Hit.ImpactPoint);
+			Hit.GetComponent()->AddImpulseAtLocation(ImpulseDir * 100000, Hit.ImpactPoint);
+			if (Hit.GetActor()->GetName().Contains("BP_Enemy"))
+			{
+				AEnemy* enemy = (AEnemy*)Hit.GetActor();
+				enemy->GetDamage(Damage);
+			}
+		}
+	}
 
+
+
+
+}
+float AGun::RandShoot(float a, float b)
+{
+	float nRand;
+	nRand = a + ((float)rand() * (b - a + 1) / (RAND_MAX - 1));
+	return nRand;
+}

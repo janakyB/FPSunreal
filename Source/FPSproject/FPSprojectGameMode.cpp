@@ -27,15 +27,26 @@ void AFPSprojectGameMode::BeginPlay()
 	CurrentDelay = DelayBetweenWaves;
 	CurrentDelayEnnemies = DelayBetweenEnemies;
 	CurrentWave = 0;
+	CharacterList.Add((AFPSprojectCharacter*)GetWorld()->GetFirstPlayerController()->GetPawn()); 
 	srand(time(NULL));
 
 }
 void AFPSprojectGameMode::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
-	CurrentDelay -= deltatime;
+	CurrentDelay -= deltatime; 
+	EnemyDeath(deltatime); 
+	DestroyEnemy(); 
+	
+	UE_LOG(LogTemp, Log, TEXT("%d"), CharacterList[0]->CurrentLife);
 
+	if (CharacterList[0]->CurrentLife <= 0)
+	{
 
+		UE_LOG(LogTemp, Log, TEXT("Je suis un chat"));
+		DeathAndRespawn();
+	}
+	
 	//GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition.Num)
 	if (CurrentDelay < 0 && CurrentWave <= NumberOfWaves)
 	{
@@ -46,6 +57,7 @@ void AFPSprojectGameMode::Tick(float deltatime)
 
 			int pos = rand() % 4;
 			AEnemy* newEnemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition[pos]);
+			EnemyList.Add(newEnemy); 
 			Count++;
 			CurrentDelayEnnemies = DelayBetweenEnemies;
 		}
@@ -61,8 +73,46 @@ void AFPSprojectGameMode::Tick(float deltatime)
 }
 void AFPSprojectGameMode::DeathAndRespawn()
 {
-
-	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+	UE_LOG(LogTemp, Log, TEXT("Je suis un chat"));
+	for  (int i = 0; i < EnemyList.Num();  i++)
+	{
+		EnemyList[i]->Destroy(); 
+	}
+	EnemyList.Empty();
+	CurrentDelay = DelayBetweenWaves;
+	CurrentDelayEnnemies = DelayBetweenEnemies;
+	Count = 0; 
+	Spawn = false;
+	CurrentWave = 0;
+	NumberEnemiesWave = 5; 
+	CharacterList[0]->DeathAndRespawn();
+	CharacterList[0]->SetActorLocation(playerespawn.GetLocation());
 }
-
+void AFPSprojectGameMode::DestroyEnemy()
+{
+	for (int i = 0; i < EnemyList.Num(); i++)
+	{
+		if (EnemyList[i]->Death == true && EnemyList[i]->DelayDeath < 0)
+		{
+			EnemyList[i]->Destroy();
+			EnemyList.RemoveSingle(EnemyList[i]);
+			/*for (int j = i + 1; j < EnemyList.Num() - j; j++)
+			{
+				EnemyList[j] = EnemyList[j - 1]; 
+			}*/
+			
+		}
+	}
+}
+void AFPSprojectGameMode::EnemyDeath(float DeltaTime)
+{
+	for (int i = 0; i < EnemyList.Num(); i++)
+	{
+		if (EnemyList[i]->Death == true)
+		{
+			EnemyList[i]->DelayDeath -= DeltaTime;
+		}
+	}
+	
+}
 

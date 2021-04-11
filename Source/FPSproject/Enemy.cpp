@@ -28,11 +28,8 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	MoveToPLayer(DeltaTime);
 	CanHit();
-	Dead();
-	if (Death == true)
-	{
-		DelayDeath -= DeltaTime;
-	}
+	//Dead();
+	
 
 }
 
@@ -72,15 +69,14 @@ bool AEnemy::CanHit()
 void AEnemy::GetDamage(float dm)
 {
 	CurrentLife -= dm;
-}
-void AEnemy::Dead()
-{
 	if (CurrentLife <= 0 && Death == false)
 	{
 		Death = true;
 		Mesh1E->PlayAnimation(animDeath, false);
-
 	}
+}
+void AEnemy::Dead()
+{
 	if (DelayDeath < 0)
 	{
 		Destroy();

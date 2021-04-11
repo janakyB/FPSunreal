@@ -2,6 +2,7 @@
 
 #include "FPSprojectCharacter.h"
 #include "FPSprojectProjectile.h"
+#include "FPSprojectGameMode.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -218,7 +219,7 @@ void AFPSprojectCharacter::OnFire()
 
 			// spawn the projectile at the muzzle
 			//World->SpawnActor<AFPSprojectProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-			UGameplayStatics::SpawnEmitterAtLocation(World, pParticle, GunList[IndexGunList]->GetGun()->GetSocketTransform((FName("Muzzle"))));
+			/*UGameplayStatics::SpawnEmitterAtLocation(World, pParticle, GunList[IndexGunList]->GetGun()->GetSocketTransform((FName("Muzzle"))));
 			World->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECC_Visibility);
 			FVector ImpulseDir = { Hit.ImpactPoint.X - StartLocation.X, Hit.ImpactPoint.Y - StartLocation.Y, Hit.ImpactPoint.Z - StartLocation.Z };
 			ImpulseDir.Normalize();
@@ -231,7 +232,8 @@ void AFPSprojectCharacter::OnFire()
 					AEnemy* enemy = (AEnemy*)Hit.GetActor();
 					enemy->GetDamage(GunList[IndexGunList]->GetDamage());
 				}
-			}
+			}*/
+			GunList[IndexGunList]->Shoot(StartLocation, EndLocation, pParticle, mParticle);
 		}
 	}
 
@@ -380,7 +382,8 @@ void AFPSprojectCharacter::GetDamage(double damage)
 	CurrentLife -= damage;
 	if (CurrentLife <= 0)
 	{
-		//UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+		UE_LOG(LogTemp, Log, TEXT("Je suis un chat"));
+		IsDead = true;
 	}
 }
 void AFPSprojectCharacter::Tick(float deltatime)
@@ -396,7 +399,9 @@ void AFPSprojectCharacter::Tick(float deltatime)
 }
 void AFPSprojectCharacter::Reload()
 {
+
 	//IsFire = false;
+	GunList[IndexGunList]->CurrentAmmo = 0; 
 	GunList[IndexGunList]->Reloading();
 }
 void AFPSprojectCharacter::ChangeWeapon(int index)
@@ -416,5 +421,13 @@ void AFPSprojectCharacter::ChangeWeapon(int index)
 }
 void AFPSprojectCharacter::DeathAndRespawn()
 {
-
+	for (int i = 0; i < GunList.Num(); i++)
+	{
+		GunList[i]->SetAmmo();
+	}
+	CurrentLife = MaxLife;
+}
+bool AFPSprojectCharacter::ReturnState()
+{
+	return IsDead;
 }

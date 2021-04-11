@@ -21,6 +21,7 @@ class AFPSprojectCharacter : public ACharacter
 
 		UPROPERTY(EditDefaultsOnly, Category = Particule)
 		class UParticleSystem* pParticle;
+
 	UPROPERTY(EditDefaultsOnly, Category = Particule)
 		class UParticleSystem* mParticle;
 
@@ -65,8 +66,10 @@ public:
 	void DeathAndRespawn();
 	void GetDamage(double);
 	void ChangeWeapon(int);
-	int MaxLife = 100;
+	bool ReturnState();
+	int MaxLife = 10;
 	int CurrentLife;
+	bool IsDead = false;
 	int IndexGunList;
 	TArray < AGun* > GunList;
 
