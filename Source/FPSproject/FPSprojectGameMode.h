@@ -26,7 +26,7 @@ public:
 	bool DelaySpawnEnemy();
 	void DeathAndRespawn();
 	void DestroyEnemy();
-	void EnemyDeath(float); 
+	void EnemyDeath(float);
 	//AFPSprojectCharacter* player;
 	int NumberOfWaves = 5;
 	int NumberEnemiesWave = 5;

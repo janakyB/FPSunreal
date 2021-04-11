@@ -35,8 +35,10 @@ class FPSPROJECT_API AGun : public AActor
 		float NumberShoot;
 
 	UPROPERTY(EditAnyWhere, Category = stats)
-		int precision; 
+		int precision;
 
+	UPROPERTY(EditAnyWhere, Category = stats)
+		bool Automatic; 
 
 public:
 	// Sets default values for this actor's properties 
@@ -46,6 +48,7 @@ public:
 	float GetDamage();
 	float GetReloadTime();
 	float GetFireRate();
+	bool GetAutomatic(); 
 	float LastTimeShoot;
 	float CurrentAmmo;
 	bool IsFire = false;

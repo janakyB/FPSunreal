@@ -392,6 +392,10 @@ void AFPSprojectCharacter::Tick(float deltatime)
 	if (IsFire == true && GunList[IndexGunList]->CanShoot() && GunList[IndexGunList]->GetAmmo() > 0)
 	{
 		OnFire();
+		if (!GunList[IndexGunList]->GetAutomatic())
+		{
+			IsFire = false;
+		}
 	}
 	else if (GunList[IndexGunList]->GetAmmo() <= 0) {
 		Reload();
@@ -399,9 +403,7 @@ void AFPSprojectCharacter::Tick(float deltatime)
 }
 void AFPSprojectCharacter::Reload()
 {
-
-	//IsFire = false;
-	GunList[IndexGunList]->CurrentAmmo = 0; 
+	GunList[IndexGunList]->CurrentAmmo = 0;
 	GunList[IndexGunList]->Reloading();
 }
 void AFPSprojectCharacter::ChangeWeapon(int index)

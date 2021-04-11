@@ -103,3 +103,7 @@ float AGun::RandShoot(float a, float b)
 	nRand = a + ((float)rand() * (b - a + 1) / (RAND_MAX - 1));
 	return nRand;
 }
+bool AGun::GetAutomatic() 
+{
+	return Automatic; 
+}

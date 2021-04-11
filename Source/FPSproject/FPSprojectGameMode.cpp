@@ -27,26 +27,23 @@ void AFPSprojectGameMode::BeginPlay()
 	CurrentDelay = DelayBetweenWaves;
 	CurrentDelayEnnemies = DelayBetweenEnemies;
 	CurrentWave = 0;
-	CharacterList.Add((AFPSprojectCharacter*)GetWorld()->GetFirstPlayerController()->GetPawn()); 
+	CharacterList.Add((AFPSprojectCharacter*)GetWorld()->GetFirstPlayerController()->GetPawn());
 	srand(time(NULL));
 
 }
 void AFPSprojectGameMode::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
-	CurrentDelay -= deltatime; 
-	EnemyDeath(deltatime); 
-	DestroyEnemy(); 
-	
-	UE_LOG(LogTemp, Log, TEXT("%d"), CharacterList[0]->CurrentLife);
-
+	CurrentDelay -= deltatime;
+	EnemyDeath(deltatime);
+	DestroyEnemy();
 	if (CharacterList[0]->CurrentLife <= 0)
 	{
 
 		UE_LOG(LogTemp, Log, TEXT("Je suis un chat"));
 		DeathAndRespawn();
 	}
-	
+
 	//GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition.Num)
 	if (CurrentDelay < 0 && CurrentWave <= NumberOfWaves)
 	{
@@ -57,7 +54,7 @@ void AFPSprojectGameMode::Tick(float deltatime)
 
 			int pos = rand() % 4;
 			AEnemy* newEnemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition[pos]);
-			EnemyList.Add(newEnemy); 
+			EnemyList.Add(newEnemy);
 			Count++;
 			CurrentDelayEnnemies = DelayBetweenEnemies;
 		}
@@ -74,17 +71,17 @@ void AFPSprojectGameMode::Tick(float deltatime)
 void AFPSprojectGameMode::DeathAndRespawn()
 {
 	UE_LOG(LogTemp, Log, TEXT("Je suis un chat"));
-	for  (int i = 0; i < EnemyList.Num();  i++)
+	for (int i = 0; i < EnemyList.Num(); i++)
 	{
-		EnemyList[i]->Destroy(); 
+		EnemyList[i]->Destroy();
 	}
 	EnemyList.Empty();
 	CurrentDelay = DelayBetweenWaves;
 	CurrentDelayEnnemies = DelayBetweenEnemies;
-	Count = 0; 
+	Count = 0;
 	Spawn = false;
 	CurrentWave = 0;
-	NumberEnemiesWave = 5; 
+	NumberEnemiesWave = 5;
 	CharacterList[0]->DeathAndRespawn();
 	CharacterList[0]->SetActorLocation(playerespawn.GetLocation());
 }
@@ -98,9 +95,9 @@ void AFPSprojectGameMode::DestroyEnemy()
 			EnemyList.RemoveSingle(EnemyList[i]);
 			/*for (int j = i + 1; j < EnemyList.Num() - j; j++)
 			{
-				EnemyList[j] = EnemyList[j - 1]; 
+				EnemyList[j] = EnemyList[j - 1];
 			}*/
-			
+
 		}
 	}
 }
@@ -113,6 +110,6 @@ void AFPSprojectGameMode::EnemyDeath(float DeltaTime)
 			EnemyList[i]->DelayDeath -= DeltaTime;
 		}
 	}
-	
+
 }
 
