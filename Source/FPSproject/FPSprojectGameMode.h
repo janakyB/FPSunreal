@@ -29,6 +29,7 @@ public:
 	void EnemyDeath(float);
 	//AFPSprojectCharacter* player;
 	int NumberOfWaves = 5;
+	int Score = 0; 
 	int NumberEnemiesWave = 5;
 	float DelayBetweenWaves = 20.0f;
 	float CurrentDelay;

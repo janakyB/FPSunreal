@@ -28,7 +28,6 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	MoveToPLayer(DeltaTime);
 	CanHit();
-	//Dead();
 	
 
 }

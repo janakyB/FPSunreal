@@ -39,12 +39,8 @@ void AFPSprojectGameMode::Tick(float deltatime)
 	DestroyEnemy();
 	if (CharacterList[0]->CurrentLife <= 0)
 	{
-
-		UE_LOG(LogTemp, Log, TEXT("Je suis un chat"));
 		DeathAndRespawn();
 	}
-
-	//GetWorld()->SpawnActor<AEnemy>(EnemyClass, SpawnPosition.Num)
 	if (CurrentDelay < 0 && CurrentWave <= NumberOfWaves)
 	{
 		Spawn = true;
@@ -79,6 +75,7 @@ void AFPSprojectGameMode::DeathAndRespawn()
 	CurrentDelay = DelayBetweenWaves;
 	CurrentDelayEnnemies = DelayBetweenEnemies;
 	Count = 0;
+	Score = 0; 
 	Spawn = false;
 	CurrentWave = 0;
 	NumberEnemiesWave = 5;
@@ -91,13 +88,10 @@ void AFPSprojectGameMode::DestroyEnemy()
 	{
 		if (EnemyList[i]->Death == true && EnemyList[i]->DelayDeath < 0)
 		{
+			Score += EnemyList[i]->EnemyScore;
+			UE_LOG(LogTemp, Log, TEXT("%d"), Score);
 			EnemyList[i]->Destroy();
 			EnemyList.RemoveSingle(EnemyList[i]);
-			/*for (int j = i + 1; j < EnemyList.Num() - j; j++)
-			{
-				EnemyList[j] = EnemyList[j - 1];
-			}*/
-
 		}
 	}
 }

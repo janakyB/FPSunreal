@@ -35,6 +35,7 @@ public:
 	float LastTimeAttack = 0.0f;
 	float CoolDown = 5.0f;
 	float Damage = 1.0f;
+	int EnemyScore = 5; 
 	FHitResult hit;
 	float MaxLife = 5;
 	float CurrentLife;
