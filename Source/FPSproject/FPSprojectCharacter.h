@@ -60,6 +60,18 @@ class AFPSprojectCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UMotionControllerComponent* L_MotionController;
 
+	UFUNCTION(BlueprintPure, Category = "Health")
+		float GetCurrentLife(); 
+
+	UFUNCTION(BlueprintPure, Category = "Health")
+		FString GetCurrentLifeString(); 
+
+	UFUNCTION(BlueprintPure, Category = "Ammo")
+		FString GetCurrentAmmoString(); 
+
+	UFUNCTION(BlueprintPure, Category = "Hitting")
+		bool BeingHitted();
+
 public:
 	AFPSprojectCharacter();
 	void OnTick(float deltatime);
@@ -67,10 +79,15 @@ public:
 	void GetDamage(double);
 	void ChangeWeapon(int);
 	bool ReturnState();
-	int MaxLife = 10;
-	int CurrentLife;
+	bool CanBeHitted(); 
+	bool IsHitted = false; 
+	float LastTimeHitted; 
+	float CoolDownHitted; 
+	float MaxLife = 100.0f;
+	float CurrentLife;
 	bool IsDead = false;
 	int IndexGunList;
+	bool IsReloading = false; 
 	TArray < AGun* > GunList;
 
 protected:

@@ -5,13 +5,18 @@
 #include "Engine/Texture2D.h"
 #include "TextureResource.h"
 #include "CanvasItem.h"
+#include "Blueprint/UserWidget.h"
 #include "UObject/ConstructorHelpers.h"
+
 
 AFPSprojectHUD::AFPSprojectHUD()
 {
 	// Set the crosshair texture
 	static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("/Game/FirstPerson/Textures/FirstPersonCrosshair"));
 	CrosshairTex = CrosshairTexObj.Object;
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> HealthBarObj(TEXT("/Game/FirstPerson/UI/UIHealthBluePrint"));
+	HUDWidgetClass = HealthBarObj.Class;
 }
 
 
@@ -32,4 +37,17 @@ void AFPSprojectHUD::DrawHUD()
 	FCanvasTileItem TileItem( CrosshairDrawPosition, CrosshairTex->Resource, FLinearColor::White);
 	TileItem.BlendMode = SE_BLEND_Translucent;
 	Canvas->DrawItem( TileItem );
+}
+
+void AFPSprojectHUD::BeginPlay() 
+{
+	Super::BeginPlay(); 
+	if (HUDWidgetClass != nullptr) 
+	{
+		CurrentWidget = CreateWidget<UUserWidget>(GetWorld(), HUDWidgetClass);
+		if (CurrentWidget != nullptr)
+		{
+			CurrentWidget->AddToViewport();
+		}
+	}
 }

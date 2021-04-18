@@ -17,7 +17,7 @@ class FPSPROJECT_API AGun : public AActor
 		USkeletalMeshComponent* FP_Gun;
 
 	UPROPERTY(EditAnyWhere, Category = stats)
-		float MaxAmmo;
+		int MaxAmmo;
 
 	UPROPERTY(EditAnyWhere, Category = stats)
 		float Damage;
@@ -44,14 +44,16 @@ public:
 	// Sets default values for this actor's properties 
 	AGun();
 	USkeletalMeshComponent* GetGun();
-	float GetAmmo();
+	int GetAmmo();
+	int GetMaxAmmo(); 
 	float GetDamage();
 	float GetReloadTime();
 	float GetFireRate();
 	bool GetAutomatic(); 
 	float LastTimeShoot;
-	float CurrentAmmo;
+	int CurrentAmmo;
 	bool IsFire = false;
+	bool IsReloading = false; 
 	FHitResult Hit;
 	void SetAmmo();
 	void Shoot(FVector, FVector, UParticleSystem*, UParticleSystem*);

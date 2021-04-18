@@ -379,18 +379,20 @@ bool AFPSprojectCharacter::EnableTouchscreenMovement(class UInputComponent* Play
 }
 void AFPSprojectCharacter::GetDamage(double damage)
 {
+	LastTimeHitted = GetGameTimeSinceCreation(); 
 	CurrentLife -= damage;
 	if (CurrentLife <= 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Je suis un chat"));
 		IsDead = true;
 	}
+	IsHitted = true; 
 }
 void AFPSprojectCharacter::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
 	if (IsFire == true && GunList[IndexGunList]->CanShoot() && GunList[IndexGunList]->GetAmmo() > 0)
 	{
+		 
 		OnFire();
 		if (!GunList[IndexGunList]->GetAutomatic())
 		{
@@ -400,11 +402,18 @@ void AFPSprojectCharacter::Tick(float deltatime)
 	else if (GunList[IndexGunList]->GetAmmo() <= 0) {
 		Reload();
 	}
+
+	if (CanBeHitted() == true) 
+	{
+		IsHitted = false; 
+	}
 }
 void AFPSprojectCharacter::Reload()
 {
+	
 	GunList[IndexGunList]->CurrentAmmo = 0;
 	GunList[IndexGunList]->Reloading();
+		
 }
 void AFPSprojectCharacter::ChangeWeapon(int index)
 {
@@ -432,4 +441,43 @@ void AFPSprojectCharacter::DeathAndRespawn()
 bool AFPSprojectCharacter::ReturnState()
 {
 	return IsDead;
+}
+
+float AFPSprojectCharacter::GetCurrentLife() 
+{
+	return CurrentLife/100; 
+}
+FString AFPSprojectCharacter::GetCurrentLifeString() 
+{
+	FString HP = FString::FromInt(CurrentLife);
+	FString HPS = HP + "%"; 
+	return HPS; 
+}
+FString AFPSprojectCharacter::GetCurrentAmmoString() 
+{
+	FString FString1 = FString::FromInt(GunList[IndexGunList]->GetAmmo()); 
+	FString FString2 = FString::FromInt(GunList[IndexGunList]->GetMaxAmmo());
+	FString Fstringtot = FString1 + "/" + FString2;
+	if (GunList[IndexGunList]->IsReloading == true)
+	{
+		Fstringtot = "Reload ..."; 
+	}
+	return  Fstringtot;
+}
+bool AFPSprojectCharacter::BeingHitted() 
+{
+	if (IsHitted == false)
+	{
+		UE_LOG(LogTemp, Log, TEXT("IsNotHitted"));
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Log, TEXT("IsHitted"));
+	}
+	
+	return IsHitted; 
+}
+bool AFPSprojectCharacter::CanBeHitted() 
+{
+	return LastTimeHitted + CoolDownHitted < GetGameTimeSinceCreation(); 
 }

@@ -106,4 +106,10 @@ void AFPSprojectGameMode::EnemyDeath(float DeltaTime)
 	}
 
 }
+FString AFPSprojectGameMode::GetScoreString() 
+{
+	FString FStringScore = FString::FromInt(Score);
+	FString FStringScoretot = "Score : " + FStringScore; 
+	return FStringScoretot; 
+}
 

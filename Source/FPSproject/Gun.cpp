@@ -29,9 +29,13 @@ USkeletalMeshComponent* AGun::GetGun()
 {
 	return FP_Gun;
 }
-float AGun::GetAmmo()
+int AGun::GetAmmo()
 {
 	return CurrentAmmo;
+}
+int AGun::GetMaxAmmo() 
+{
+	return MaxAmmo; 
 }
 float AGun::GetDamage()
 {
@@ -59,8 +63,14 @@ bool AGun::CanReload()
 }
 void AGun::Reloading()
 {
+	if (IsReloading == false) 
+	{
+		LastTimeShoot = GetGameTimeSinceCreation();
+	}
+	IsReloading = true;
 	if (CanReload())
 	{
+		IsReloading = false; 
 		SetAmmo();
 	}
 }
