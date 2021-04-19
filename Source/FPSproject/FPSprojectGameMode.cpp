@@ -110,6 +110,11 @@ FString AFPSprojectGameMode::GetScoreString()
 {
 	FString FStringScore = FString::FromInt(Score);
 	FString FStringScoretot = "Score : " + FStringScore; 
-	return FStringScoretot; 
+	FString FStringTImer = FString::FromInt(CurrentDelay); 
+	FString FStringTimer2 = "Temps avant la prochaine vague : " + FStringTImer; 
+	FString FStringTot = FStringTimer2 + "\n" + FStringScoretot;
+	return  FStringTot;
+	;
 }
+
 

@@ -21,8 +21,10 @@ class AFPSprojectGameMode : public AGameModeBase
 	UPROPERTY(EditDefaultsOnly, Category = PlayerRespawn)
 		FTransform playerespawn;
 	
-	UFUNCTION(BlueprintPure, Category = Score)
+	UFUNCTION(BlueprintPure, Category = score)
 		FString GetScoreString(); 
+
+
 public:
 	AFPSprojectGameMode();
 	void WaveManager();
